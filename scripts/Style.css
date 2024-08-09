@@ -1,0 +1,20 @@
+body {
+    background-color: rgb(60, 60, 60) !important;
+    color: rgb(255, 255, 255) !important;
+    display: flex;
+}
+
+grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(97px, 1fr));
+    width: 250%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+grid div {
+    border: 2px solid #ccc;
+    aspect-ratio: 1 / 1;
+    box-sizing: border-box;
+    transition: background-color 0.125s ease;
+}
