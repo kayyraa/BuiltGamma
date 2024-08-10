@@ -114,13 +114,13 @@ for (let Index = 0; Index < Buildings.length; Index++) {
     BuildingFrame.appendChild(BuildingLabel);
 
     BuildingLabel.addEventListener("click", function() {
-        CurrentSelectedBuilding = Buildings[Index];
+        CurrentSelectedBuilding = this;
     });
     BuildingLabel.addEventListener("mouseenter", function() {
-        Buildings[Index].style.backgroundColor = "rgba(255, 255, 255, 0.25)";
+        this.style.backgroundColor = "rgba(255, 255, 255, 0.25)";
     });
     BuildingLabel.addEventListener("mouseleave", function() {
-        Buildings[Index].style.backgroundColor = "rgba(255, 255, 255, 0.125)";
+        this.style.backgroundColor = "rgba(255, 255, 255, 0.125)";
     });
 }
 
