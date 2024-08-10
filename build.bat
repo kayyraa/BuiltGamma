@@ -14,5 +14,3 @@ git push origin main
 cd ..
 timeout /t 5 /nobreak >nul
 rd /s /q "%TempDir%"
-echo Files copied and pushed to GitHub repository.
-pause

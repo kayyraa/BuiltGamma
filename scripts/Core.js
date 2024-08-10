@@ -114,13 +114,7 @@ for (let Index = 0; Index < Buildings.length; Index++) {
     BuildingFrame.appendChild(BuildingLabel);
 
     BuildingLabel.addEventListener("click", function() {
-        CurrentSelectedBuilding = this;
-    });
-    BuildingLabel.addEventListener("mouseenter", function() {
-        this.style.backgroundColor = "rgba(255, 255, 255, 0.25)";
-    });
-    BuildingLabel.addEventListener("mouseleave", function() {
-        this.style.backgroundColor = "rgba(255, 255, 255, 0.125)";
+        CurrentSelectedBuilding = Buildings[Index];
     });
 }
 
@@ -198,7 +192,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 localStorage.setItem("Money", parseInt(localStorage.getItem("Money")) + ConstructedBuilding.Gain)
             });
         }
-
         setTimeout(Gainloop, 125);
     }
 
@@ -253,7 +246,6 @@ document.addEventListener("DOMContentLoaded", function() {
         if (localStorage.getItem("Money") !== null) {
             MoneyLabel.innerHTML = `${localStorage.getItem("Money")}$`;
         }
-
         setInterval(Loop, 125);
     }
 
