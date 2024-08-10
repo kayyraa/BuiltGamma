@@ -28,7 +28,8 @@ if (localStorage.getItem("Money") === null || isNaN(localStorage.getItem("Money"
 }
 
 const RotationCursor = document.createElement("img");
-RotationCursor.style.transition = "transform 0.125s ease";
+RotationCursor.style.transition = "transform 0.125s ease, opacity 0.25s ease";
+RotationCursor.style.opacity = "0";
 RotationCursor.style.position = "fixed";
 RotationCursor.src = "../images/arrow.svg";
 RotationCursor.style.width = "1%";
@@ -196,6 +197,7 @@ for (let Index = 0; Index < MapSize; Index++) {
     });
     GridElement.addEventListener("mousedown", function (event) {
         TutorialContrainter.style.opacity = "0";
+	RotationCursor.style.opacity = "1";
         setTimeout(() => {
             TutorialContrainter.remove();
         }, 250);
@@ -325,6 +327,7 @@ function Loop() {
         ClearSelection();
         SelectionFrame.style.opacity = "0";
         BuildingFrame.style.opacity = "0";
+	RotationCursor.style.opacity = "0";
     }
 
     if (CurrentSelectedBuilding) {
