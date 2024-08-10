@@ -2,6 +2,8 @@ let CurrentSelection = null;
 let CurrentHover = null;
 let CurrentSelectedBuilding = null;
 
+let GainMultiplier = 0.75;
+
 const Buildings = [
     { Name: "House", Price: 100, Gain: 1, Icon: "../images/house.svg" },
     { Name: "Factory", Price: 150, Gain: 10, Icon: "../images/factory.svg" },
@@ -242,7 +244,7 @@ function ClearSelection() {
 function GainLoop() {
     if (ConstructedBuildings.length > 0) {
         ConstructedBuildings.forEach(building => {
-            localStorage.setItem("Money", parseInt(localStorage.getItem("Money")) + building.Gain);
+            localStorage.setItem("Money", parseInt(localStorage.getItem("Money")) + (building.Gain * GainMultiplier));
         });
     }
 
