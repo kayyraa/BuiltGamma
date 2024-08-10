@@ -336,7 +336,7 @@ function Loop() {
     RotationCursor.style.transform = `rotate(${Rotation}deg)`;
 
     if (CurrentSelection) {
-	RotationCursor.style.opacity = "1";
+	    RotationCursor.style.opacity = "1";
         SelectionFrame.style.opacity = "1";
         BuildingFrame.style.opacity = "1";
         ClearSelection();
@@ -348,7 +348,7 @@ function Loop() {
         ClearSelection();
         SelectionFrame.style.opacity = "0";
         BuildingFrame.style.opacity = "0";
-	RotationCursor.style.opacity = "0";
+	    RotationCursor.style.opacity = "0";
     }
 
     if (CurrentSelectedBuilding) {
@@ -360,6 +360,7 @@ function Loop() {
                 Building.style.border = "none";
                 Building.style.transform = `rotate(${Rotation}deg)`;
                 Building.dataset.Price = CurrentSelectedBuilding.Price;
+                Building.id = ConstructedBuildings.length
 
                 if (CurrentSelectedBuilding.Icon === "") {
                     Building.style.backgroundColor = "white";
@@ -373,7 +374,6 @@ function Loop() {
                     Building.appendChild(Image);
                 }
 
-                Building.id = CurrentSelectedBuilding.Name;
                 localStorage.setItem("Money", parseInt(localStorage.getItem("Money")) - CurrentSelectedBuilding.Price);
                 ConstructedBuildings.push({ id: CurrentSelection.id, ...CurrentSelectedBuilding });
                 CurrentSelection.appendChild(Building);
