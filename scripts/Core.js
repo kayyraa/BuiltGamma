@@ -91,7 +91,7 @@ BuildingFrame.style.gap = "10px";
 BuildingFrame.style.overflowX = "scroll";
 document.body.appendChild(BuildingFrame);
 
-BuildingFrame.addEventListener("wheel", function(e) {
+BuildingFrame.addEventListener("wheel", function (e) {
     BuildingFrame.scrollLeft = e.deltaY / 2;
 })
 
@@ -113,7 +113,7 @@ for (let Index = 0; Index < Buildings.length; Index++) {
     BuildingLabel.style.cursor = "pointer";
     BuildingFrame.appendChild(BuildingLabel);
 
-    BuildingLabel.addEventListener("click", function() {
+    BuildingLabel.addEventListener("click", function () {
         CurrentSelectedBuilding = Buildings[Index];
     });
 }
@@ -133,122 +133,127 @@ for (let index = 0; index < 135; index++) {
     GridElement.style.cursor = "pointer";
     GridType.appendChild(GridElement);
 
-    GridElement.addEventListener("mouseenter", function() {
+    GridElement.addEventListener("mouseenter", function () {
         this.style.backgroundColor = "rgba(255, 255, 255, 0.125)";
         CurrentHover = this;
     });
-    GridElement.addEventListener("mouseleave", function() {
+    GridElement.addEventListener("mouseleave", function () {
         this.style.backgroundColor = "rgba(255, 255, 255, 0)";
         CurrentHover = null;
     });
-    GridElement.addEventListener("mousedown", function(event) {
+    GridElement.addEventListener("mousedown", function (event) {
         if (event.button === 0) {
             CurrentSelection = this;
         }
     });
 }
 
-document.addEventListener('wheel', function(Event) {
+document.addEventListener('wheel', function (Event) {
     if (Event.ctrlKey) {
         Event.preventDefault();
     }
 }, { passive: false });
 
-document.addEventListener("contextmenu", function(Event) {
+document.addEventListener("contextmenu", function (Event) {
     Event.preventDefault();
     CurrentSelection = null;
     CurrentSelectedBuilding = null;
 })
 
-document.addEventListener("DOMContentLoaded", function() {
-    const IsMobile = navigator.userAgentData.mobile;
-    if (document.title === "Redirecting") {
-        if (IsMobile) {
-            window.location.href = "../mobile.html"
-        } else {
-            window.location.href = "../desktop.html"
-        }
-    }
+const IsMobile = navigator.userAgentData.mobile;
 
-    function ClearSelection() {
-        const GridElements = Array.from(GridType.getElementsByTagName("div"));
-        GridElements.forEach(GridElement => {
-            if (GridElement !== CurrentSelection && GridElement !== CurrentHover) {
-                GridElement.style.backgroundColor = "rgba(255, 255, 255, 0)";
-            }
+if (document.title === "Redirecting") {
+    if (IsMobile) {
+        window.location.href = "../mobile.html";
+    } else {
+        window.location.href = "../desktop.html";
+    }
+}
+
+function ClearSelection() {
+    const GridElements = Array.from(GridType.getElementsByTagName("div"));
+    GridElements.forEach(GridElement => {
+        if (GridElement !== CurrentSelection && GridElement !== CurrentHover) {
+            GridElement.style.backgroundColor = "rgba(255, 255, 255, 0)";
+        }
+    });
+
+    const BuildingElements = Array.from(BuildingFrame.getElementsByTagName("span"));
+    BuildingElements.forEach(BuildingElement => {
+        if (BuildingElement !== CurrentSelectedBuilding) {
+            BuildingElement.style.backgroundColor = "rgba(255, 255, 255, 0.125)";
+        }
+    });
+}
+
+function Gainloop() {
+    if (ConstructedBuildings.length > 0) {
+        ConstructedBuildings.forEach(ConstructedBuilding => {
+            localStorage.setItem("Money", parseInt(localStorage.getItem("Money")) + ConstructedBuilding.Gain);
         });
-
-        const BuildingElements = Array.from(BuildingFrame.getElementsByTagName("span"));
-        BuildingElements.forEach(BuildingElement => {
-            if (BuildingElement !== CurrentSelectedBuilding) {
-                BuildingElement.style.backgroundColor = "rgba(255, 255, 255, 0.125)";
-            }
-        });
     }
 
-    function Gainloop() {
-        if (ConstructedBuildings.length > 0) {
-            ConstructedBuildings.forEach(ConstructedBuilding => {
-                localStorage.setItem("Money", parseInt(localStorage.getItem("Money")) + ConstructedBuilding.Gain)
-            });
-        }
-        setTimeout(Gainloop, 125);
+    setTimeout(() => {
+        Gainloop();
+    }, 500);
+}
+
+function Loop() {
+    if (CurrentSelection) {
+        SelectionFrame.style.opacity = "1";
+        BuildingFrame.style.opacity = "1";
+        ClearSelection();
+        SelectionLabel.innerHTML = CurrentSelection.id;
+        CurrentSelection.style.backgroundColor = "rgba(255, 255, 255, 0.125)";
+        CurrentSelection.dataset.ChildrenCount = CurrentSelection.children.length;
+        SelectionLabel.innerHTML = `${CurrentSelection.id} - ${CurrentSelection.dataset.ChildrenCount}`;
+    } else {
+        ClearSelection();
+        SelectionFrame.style.opacity = "0";
+        BuildingFrame.style.opacity = "0";
     }
 
-    function Loop() {
-        if (CurrentSelection) {
-            SelectionFrame.style.opacity = "1";
-            BuildingFrame.style.opacity = "1";
-            ClearSelection();
-            SelectionLabel.innerHTML = CurrentSelection.id;
-            CurrentSelection.style.backgroundColor = "rgba(255, 255, 255, 0.125)";
-            CurrentSelection.dataset.ChildrenCount = CurrentSelection.children.length;
-            SelectionLabel.innerHTML = `${CurrentSelection.id} - ${CurrentSelection.dataset.ChildrenCount}`;
-        } else {
-            ClearSelection();
-            SelectionFrame.style.opacity = "0";
-            BuildingFrame.style.opacity = "0";
-        }
+    if (CurrentSelectedBuilding) {
+        if (parseInt(localStorage.getItem("Money")) >= CurrentSelectedBuilding.Price) {
+            if (!CurrentSelection.children.length > 0) {
+                const Building = document.createElement("div");
+                Building.style.width = "75%";
+                Building.style.height = "75%";
+                Building.style.border = "none";
 
-        if (CurrentSelectedBuilding) {
-            if (parseInt(localStorage.getItem("Money")) >= CurrentSelectedBuilding.Price) {
-                if (!CurrentSelection.children.length > 0) {
-                    const Building = document.createElement("div");
-                    Building.style.width = "75%";
-                    Building.style.height = "75%";
-                    Building.style.border = "none";
-                    
-                    if (CurrentSelectedBuilding.Icon === "") {
-                        Building.style.backgroundColor = "white";
-                    } else {
-                        const Image = document.createElement("img");
-                        Image.src = CurrentSelectedBuilding.Icon;
-                        Image.style.width = "100%";
-                        Image.style.height = "100%";
-                        Image.style.aspectRatio = "1 / 1";
-                        Image.style.border = "none";
-                        Building.appendChild(Image);
-                    }
-    
-                    Building.id = CurrentSelectedBuilding.Name
-                    localStorage.setItem("Money", parseInt(localStorage.getItem("Money")) - CurrentSelectedBuilding.Price)
-                    ConstructedBuildings.push(CurrentSelectedBuilding)
-                    CurrentSelection.appendChild(Building);
-                    CurrentSelection.dataset.ChildCount = CurrentSelection.dataset.ChildCount + 1;
+                if (CurrentSelectedBuilding.Icon === "") {
+                    Building.style.backgroundColor = "white";
+                } else {
+                    const Image = document.createElement("img");
+                    Image.src = CurrentSelectedBuilding.Icon;
+                    Image.style.width = "100%";
+                    Image.style.height = "100%";
+                    Image.style.aspectRatio = "1 / 1";
+                    Image.style.border = "none";
+                    Building.appendChild(Image);
                 }
-    
-                CurrentSelectedBuilding = null;
-                CurrentSelection = null;
-                ClearSelection();
-            }
-        }
 
-        if (localStorage.getItem("Money") !== null) {
-            MoneyLabel.innerHTML = `${localStorage.getItem("Money")}$`;
+                Building.id = CurrentSelectedBuilding.Name;
+                localStorage.setItem("Money", parseInt(localStorage.getItem("Money")) - CurrentSelectedBuilding.Price);
+                ConstructedBuildings.push(CurrentSelectedBuilding);
+                CurrentSelection.appendChild(Building);
+                CurrentSelection.dataset.ChildCount = CurrentSelection.dataset.ChildCount + 1;
+            }
+
+            CurrentSelectedBuilding = null;
+            CurrentSelection = null;
+            ClearSelection();
         }
-        setInterval(Loop, 125);
     }
 
-    Gainloop();
-    Loop();
-});
+    if (localStorage.getItem("Money") !== null) {
+        MoneyLabel.innerHTML = `${localStorage.getItem("Money")}$`;
+    }
+
+    setTimeout(() => {
+        Loop();
+    }, 125);
+}
+
+Gainloop();
+Loop();
