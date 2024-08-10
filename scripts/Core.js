@@ -3,6 +3,7 @@ let CurrentHover = null;
 let CurrentSelectedBuilding = null;
 
 let GainMultiplier = 0.5;
+let PriceMultiplier = 1.5;
 
 const Buildings = [
     { Name: "House", Price: 100, Gain: 2, Icon: "../images/house.svg" },
@@ -112,6 +113,8 @@ BuildingFrame.addEventListener("wheel", function (e) {
 });
 
 for (let Index = 0; Index < Buildings.length; Index++) {
+    Buildings[Index].Price = Buildings[Index].Price * PriceMultiplier;
+
     const BuildingContainer = document.createElement("div");
     BuildingContainer.style.display = "flex";
     BuildingContainer.style.flexDirection = "column";
