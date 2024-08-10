@@ -6,9 +6,12 @@ let GainMultiplier = 1.25;
 let PriceMultiplier = 1.5;
 let StarterMoney = 500;
 
+let GainEvery = 250;
+
 let MapSize = 255;
 
 let Rotation = 0;
+let RotationScale = 45;
 
 const Buildings = [
     { Name: "House", Price: 100, Gain: 2, Icon: "../images/house.svg" },
@@ -112,12 +115,12 @@ SelectionFrame.appendChild(SelectionLabel);
 
 const BuildingFrame = document.createElement("div");
 BuildingFrame.style.position = "fixed";
-BuildingFrame.style.top = "91.5%";
-BuildingFrame.style.left = "20.5%";
+BuildingFrame.style.top = "90%";
+BuildingFrame.style.left = "23%";
 BuildingFrame.style.transform = "translate(-50%, -50%)";
 BuildingFrame.style.background = "rgba(255, 255, 255, 0.125)";
 BuildingFrame.style.transition = "opacity 0.125s ease";
-BuildingFrame.style.width = "40%";
+BuildingFrame.style.width = "45%";
 BuildingFrame.style.height = "auto";
 BuildingFrame.style.display = "flex";
 BuildingFrame.style.flexWrap = "nowrap";
@@ -128,6 +131,7 @@ document.body.appendChild(BuildingFrame);
 
 BuildingFrame.addEventListener("wheel", function (e) {
     BuildingFrame.scrollLeft += e.deltaY;
+    e.preventDefault();
 });
 
 for (let Index = 0; Index < Buildings.length; Index++) {
@@ -159,11 +163,28 @@ for (let Index = 0; Index < Buildings.length; Index++) {
     PriceLabel.style.textAlign = "center";
     PriceLabel.style.width = "100%";
     PriceLabel.style.backgroundColor = "transparent";
-    PriceLabel.style.fontSize = `${Math.min(BuildingContainer.width, BuildingContainer.height) / 0.5}px`;
+    PriceLabel.style.fontSize = "16px";
     PriceLabel.style.fontFamily = "Arial";
-    PriceLabel.style.fontWeight = "500";
+    PriceLabel.style.fontWeight = "800";
+
+    const GainLabel = document.createElement("span");
+
+    const FormattedGain = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2
+    }).format(Buildings[Index].Gain);
+
+    GainLabel.innerHTML = `${FormattedGain}, ${GainEvery / 1000}s`;
+    GainLabel.style.textAlign = "center";
+    GainLabel.style.width = "100%";
+    GainLabel.style.backgroundColor = "transparent";
+    GainLabel.style.fontSize = "14px";
+    GainLabel.style.fontFamily = "Arial";
+    GainLabel.style.fontWeight = "600";
 
     BuildingContainer.appendChild(BuildingLabel);
+    BuildingContainer.appendChild(GainLabel);
     BuildingContainer.appendChild(PriceLabel);
     BuildingFrame.appendChild(BuildingContainer);
 
@@ -239,7 +260,7 @@ document.addEventListener("mousemove", function(Event) {
 
 document.addEventListener("keydown", function(Event) {
     if (Event.key.toUpperCase() === "R") {
-        Rotation += 90;
+        Rotation += RotationScale;
     }
 })
 
@@ -298,7 +319,7 @@ function GainLoop() {
 
     setTimeout(() => {
         GainLoop();
-    }, 500);
+    }, GainEvery);
 }
 
 function Loop() {
