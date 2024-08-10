@@ -197,7 +197,6 @@ for (let Index = 0; Index < MapSize; Index++) {
     });
     GridElement.addEventListener("mousedown", function (event) {
         TutorialContrainter.style.opacity = "0";
-	RotationCursor.style.opacity = "1";
         setTimeout(() => {
             TutorialContrainter.remove();
         }, 250);
@@ -316,6 +315,7 @@ function Loop() {
     RotationCursor.style.transform = `rotate(${Rotation}deg)`;
 
     if (CurrentSelection) {
+	RotationCursor.style.opacity = "1";
         SelectionFrame.style.opacity = "1";
         BuildingFrame.style.opacity = "1";
         ClearSelection();
