@@ -2,7 +2,7 @@ let CurrentSelection = null;
 let CurrentHover = null;
 let CurrentSelectedBuilding = null;
 
-let GainMultiplier = 0.75;
+let GainMultiplier = 0.5;
 
 const Buildings = [
     { Name: "House", Price: 100, Gain: 2, Icon: "../images/house.svg" },
