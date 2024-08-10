@@ -5,11 +5,12 @@ let CurrentSelectedBuilding = null;
 let GainMultiplier = 0.75;
 
 const Buildings = [
-    { Name: "House", Price: 100, Gain: 1, Icon: "../images/house.svg" },
-    { Name: "Factory", Price: 150, Gain: 10, Icon: "../images/factory.svg" },
-    { Name: "Office", Price: 250, Gain: 25, Icon: "../images/office.svg" },
-    { Name: "Hotel", Price: 500, Gain: 50, Icon: "../images/hotel.svg" },
-    { Name: "Bank", Price: 1000, Gain: 100, Icon: "../images/bank.svg" }
+    { Name: "House", Price: 100, Gain: 2, Icon: "../images/house.svg" },
+    { Name: "Factory", Price: 150, Gain: 5, Icon: "../images/factory.svg" },
+    { Name: "Office", Price: 250, Gain: 10, Icon: "../images/office.svg" },
+    { Name: "Hotel", Price: 500, Gain: 15, Icon: "../images/hotel.svg" },
+    { Name: "Bank", Price: 1000, Gain: 25, Icon: "../images/bank.svg" },
+    { Name: "Mall", Price: 1750, Gain: 40, Icon: "../images/mall.svg" }
 ];
 
 let ConstructedBuildings = [];
