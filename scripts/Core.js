@@ -2,8 +2,13 @@ let CurrentSelection = null;
 let CurrentHover = null;
 let CurrentSelectedBuilding = null;
 
-let GainMultiplier = 0.5;
+let GainMultiplier = 1.25;
 let PriceMultiplier = 1.5;
+let StarterMoney = 500;
+
+let MapSize = 255;
+
+let Rotation = 0;
 
 const Buildings = [
     { Name: "House", Price: 100, Gain: 2, Icon: "../images/house.svg" },
@@ -11,14 +16,24 @@ const Buildings = [
     { Name: "Office", Price: 250, Gain: 10, Icon: "../images/office.svg" },
     { Name: "Hotel", Price: 500, Gain: 15, Icon: "../images/hotel.svg" },
     { Name: "Bank", Price: 1000, Gain: 25, Icon: "../images/bank.svg" },
-    { Name: "Mall", Price: 1750, Gain: 40, Icon: "../images/mall.svg" }
+    { Name: "Warehouse", Price: 2500, Gain: 40, Icon: "../images/warehouse.svg" },
+    { Name: "Hospital", Price: 10000, Gain: 80, Icon: "../images/hospital.svg" },
+    { Name: "Reactor", Price: 25000, Gain: 200, Icon: "../images/reactor.svg" },
 ];
 
 let ConstructedBuildings = [];
 
 if (localStorage.getItem("Money") === null || isNaN(localStorage.getItem("Money"))) {
-    localStorage.setItem("Money", 150);
+    localStorage.setItem("Money", StarterMoney);
 }
+
+const RotationCursor = document.createElement("img");
+RotationCursor.style.transition = "transform 0.125s ease";
+RotationCursor.style.position = "fixed";
+RotationCursor.src = "../images/arrow.svg";
+RotationCursor.style.width = "1%";
+RotationCursor.style.height = "auto";
+document.body.appendChild(RotationCursor);
 
 const TutorialContrainter = document.createElement("div");
 TutorialContrainter.style.position = "fixed";
@@ -61,10 +76,11 @@ MoneyType.zIndex = -9999;
 document.body.appendChild(MoneyType);
 
 const MoneyLabel = document.createElement("span");
-MoneyLabel.style.fontSize = "24px";
+MoneyLabel.style.fontSize = `${Math.min(MoneyType.width, MoneyType.height) / 0.5}px`;
 MoneyLabel.style.fontFamily = "Arial";
 MoneyLabel.style.fontWeight = "700";
-MoneyLabel.innerHTML = "150$";
+MoneyLabel.style.transition = "font-size 0.25s ease";
+MoneyLabel.innerHTML = `${StarterMoney}$`;
 MoneyLabel.zIndex = 0;
 MoneyType.appendChild(MoneyLabel);
 
@@ -86,7 +102,8 @@ document.body.appendChild(SelectionFrame);
 const SelectionLabel = document.createElement("span");
 SelectionLabel.style.width = "75%";
 SelectionLabel.style.height = "25%";
-SelectionLabel.style.fontSize = "32px";
+SelectionFrame.style.textAlign = "center";
+SelectionLabel.style.fontSize = `${Math.min(SelectionFrame.width, SelectionFrame.height) / 0.5}px`;
 SelectionLabel.style.padding = "24px";
 SelectionLabel.style.fontFamily = "Arial";
 SelectionLabel.style.fontWeight = "900";
@@ -94,12 +111,12 @@ SelectionFrame.appendChild(SelectionLabel);
 
 const BuildingFrame = document.createElement("div");
 BuildingFrame.style.position = "fixed";
-BuildingFrame.style.top = "91%";
-BuildingFrame.style.left = "18%";
+BuildingFrame.style.top = "91.5%";
+BuildingFrame.style.left = "20.5%";
 BuildingFrame.style.transform = "translate(-50%, -50%)";
 BuildingFrame.style.background = "rgba(255, 255, 255, 0.125)";
 BuildingFrame.style.transition = "opacity 0.125s ease";
-BuildingFrame.style.width = "35%";
+BuildingFrame.style.width = "40%";
 BuildingFrame.style.height = "auto";
 BuildingFrame.style.display = "flex";
 BuildingFrame.style.flexWrap = "nowrap";
@@ -141,7 +158,7 @@ for (let Index = 0; Index < Buildings.length; Index++) {
     PriceLabel.style.textAlign = "center";
     PriceLabel.style.width = "100%";
     PriceLabel.style.backgroundColor = "transparent";
-    PriceLabel.style.fontSize = "14px";
+    PriceLabel.style.fontSize = `${Math.min(BuildingContainer.width, BuildingContainer.height) / 0.5}px`;
     PriceLabel.style.fontFamily = "Arial";
     PriceLabel.style.fontWeight = "500";
 
@@ -154,7 +171,7 @@ for (let Index = 0; Index < Buildings.length; Index++) {
     });
 }
 
-for (let Index = 0; Index < 135; Index++) {
+for (let Index = 0; Index < MapSize; Index++) {
     const Row = String.fromCharCode(65 + Math.floor(Index / 16));
     const Column = Index % 16;
     const ElementName = `${Row}${Column}`;
@@ -195,6 +212,13 @@ for (let Index = 0; Index < 135; Index++) {
             if (BuildingToRemove) {
                 ConstructedBuildings = ConstructedBuildings.filter(building => building.id !== this.id);
                 
+                
+                Array.from(CurrentHover.getElementsByTagName("div")).forEach(Building => {
+                    let Comeback = parseInt(Building.dataset.Price * 0.75);
+                    let CurrentMoney = parseInt(localStorage.getItem("Money"));
+                    localStorage.setItem("Money", CurrentMoney + Comeback);
+                });
+
                 Array.from(this.getElementsByTagName("div")).forEach(element => {
                     element.remove();
                 });
@@ -207,6 +231,17 @@ for (let Index = 0; Index < 135; Index++) {
     });
 }
 
+document.addEventListener("mousemove", function(Event) {
+    RotationCursor.style.left = `${Event.clientX + 10}px`;
+    RotationCursor.style.top = `${Event.clientY + 10}px`;
+})
+
+document.addEventListener("keydown", function(Event) {
+    if (Event.key.toUpperCase() === "R") {
+        Rotation += 90;
+    }
+})
+
 document.addEventListener('wheel', function (Event) {
     if (Event.ctrlKey) {
         Event.preventDefault();
@@ -218,6 +253,14 @@ document.addEventListener("contextmenu", function (Event) {
     CurrentSelection = null;
     CurrentSelectedBuilding = null;
 })
+
+window.onbeforeunload = function() {
+    if (ConstructedBuildings.length > 0) {
+        ConstructedBuildings.forEach(Building => {
+            localStorage.setItem("Money", parseInt(localStorage.getItem("Money")) + Building.Price);
+        });
+    }
+}
 
 const IsMobile = navigator.userAgentData.mobile;
 
@@ -247,8 +290,8 @@ function ClearSelection() {
 
 function GainLoop() {
     if (ConstructedBuildings.length > 0) {
-        ConstructedBuildings.forEach(building => {
-            localStorage.setItem("Money", parseInt(localStorage.getItem("Money")) + (building.Gain * GainMultiplier));
+        ConstructedBuildings.forEach(Building => {
+            localStorage.setItem("Money", parseInt(localStorage.getItem("Money")) + (Building.Gain * GainMultiplier));
         });
     }
 
@@ -258,6 +301,18 @@ function GainLoop() {
 }
 
 function Loop() {
+    if ((Rotation % 360) === 0) {
+        RotationCursor.src = "../images/arrow-green.svg";
+    } else if ((Rotation % 360) === 90) {
+        RotationCursor.src = "../images/arrow-red.svg";
+    } else if ((Rotation % 360) === 180) {
+        RotationCursor.src = "../images/arrow-blue.svg";
+    } else if ((Rotation % 360) === 270) {
+        RotationCursor.src = "../images/arrow.svg";
+    }
+
+    RotationCursor.style.transform = `rotate(${Rotation}deg)`;
+
     if (CurrentSelection) {
         SelectionFrame.style.opacity = "1";
         BuildingFrame.style.opacity = "1";
@@ -265,7 +320,7 @@ function Loop() {
         SelectionLabel.innerHTML = CurrentSelection.id;
         CurrentSelection.style.backgroundColor = "rgba(255, 255, 255, 0.125)";
         CurrentSelection.dataset.ChildrenCount = CurrentSelection.children.length;
-        SelectionLabel.innerHTML = `${CurrentSelection.id} - ${CurrentSelection.dataset.ChildrenCount}`;
+        SelectionLabel.innerHTML = CurrentSelection.id;
     } else {
         ClearSelection();
         SelectionFrame.style.opacity = "0";
@@ -279,6 +334,8 @@ function Loop() {
                 Building.style.width = "75%";
                 Building.style.height = "75%";
                 Building.style.border = "none";
+                Building.style.transform = `rotate(${Rotation}deg)`;
+                Building.dataset.Price = CurrentSelectedBuilding.Price;
 
                 if (CurrentSelectedBuilding.Icon === "") {
                     Building.style.backgroundColor = "white";
@@ -306,7 +363,13 @@ function Loop() {
     }
 
     if (localStorage.getItem("Money") !== null) {
-        MoneyLabel.innerHTML = `${localStorage.getItem("Money")}$`;
+        let MoneyAmount = parseFloat(localStorage.getItem("Money"));
+        let Formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        });
+
+        MoneyLabel.innerHTML = Formatter.format(MoneyAmount);
     }
 
     setTimeout(() => {
