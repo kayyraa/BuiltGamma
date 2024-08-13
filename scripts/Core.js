@@ -6,9 +6,9 @@ let GainMultiplier = 1.25;
 let PriceMultiplier = 1.5;
 let StarterMoney = 500;
 
-let GainEvery = 250;
+let GainEvery = 500;
 
-let MapSize = 255;
+let MapSize = window.innerWidth * 0.2145;
 
 let Rotation = 0;
 let RotationScale = 45;
@@ -25,6 +25,7 @@ const Buildings = [
 ];
 
 let ConstructedBuildings = [];
+const IsMobile = navigator.userAgentData.mobile;
 
 if (localStorage.getItem("Money") === null || isNaN(localStorage.getItem("Money"))) {
     localStorage.setItem("Money", StarterMoney);
@@ -42,12 +43,17 @@ document.body.appendChild(RotationCursor);
 const TutorialContrainter = document.createElement("div");
 TutorialContrainter.style.position = "fixed";
 TutorialContrainter.style.right = "0.5%";
-TutorialContrainter.style.top = "84%";
+TutorialContrainter.style.top = "85%";
 TutorialContrainter.style.width = "26.5%";
-TutorialContrainter.style.height = "15%";
+TutorialContrainter.style.height = "13.5%";
 TutorialContrainter.style.transition = "opacity 0.25s ease";
 TutorialContrainter.style.backgroundColor = "rgba(255, 255, 255, 0.125)";
+TutorialContrainter.style.display = "flex";
+TutorialContrainter.style.flexDirection = "column";
+TutorialContrainter.style.justifyContent = "center";
+TutorialContrainter.style.alignItems = "flex-start";
 TutorialContrainter.zIndex = -9999;
+TutorialContrainter.style.overflow = "hidden";
 document.body.appendChild(TutorialContrainter);
 
 const TutorialLabel = document.createElement("span");
@@ -58,25 +64,38 @@ TutorialLabel.style.marginLeft = "3%";
 TutorialLabel.style.fontWeight = "700";
 TutorialContrainter.appendChild(TutorialLabel);
 
-const TutorialText = document.createElement("p");
-TutorialText.innerHTML = "Left Click: Select / Right Click: Deselect";
-TutorialText.style.fontFamily = "Arial";
-TutorialText.style.fontSize = "16px";
-TutorialText.style.marginLeft = "3%";
-TutorialText.style.fontWeight = "700";
-TutorialContrainter.appendChild(TutorialText);
+const TutorialTextSelect = document.createElement("p");
+TutorialTextSelect.innerHTML = "Left Click: Select";
+TutorialTextSelect.style.fontFamily = "Arial";
+TutorialTextSelect.style.fontSize = "16px";
+TutorialTextSelect.style.marginLeft = "3%";
+TutorialTextSelect.style.marginTop = "0";
+TutorialTextSelect.style.marginBottom = "4px";
+TutorialTextSelect.style.fontWeight = "700";
+TutorialContrainter.appendChild(TutorialTextSelect);
+
+const TutorialTextDeSelect = document.createElement("p");
+TutorialTextDeSelect.innerHTML = "Right Click: Deselect";
+TutorialTextDeSelect.style.fontFamily = "Arial";
+TutorialTextDeSelect.style.fontSize = "16px";
+TutorialTextDeSelect.style.marginLeft = "3%";
+TutorialTextDeSelect.style.marginTop = "0";
+TutorialTextDeSelect.style.marginBottom = "0";
+TutorialTextDeSelect.style.fontWeight = "700";
+TutorialContrainter.appendChild(TutorialTextDeSelect);
 
 const MoneyType = document.createElement("div");
 MoneyType.style.position = "fixed";
 MoneyType.style.right = "0.6%";
 MoneyType.style.width = "19.9%";
-MoneyType.style.height = "6.125%";
+MoneyType.style.height = "11%";
 MoneyType.style.backgroundColor = "rgba(255, 255, 255, 0.125)";
 MoneyType.style.display = "flex";
+MoneyType.style.flexDirection = "column";
 MoneyType.style.justifyContent = "center";
 MoneyType.style.alignItems = "center";
 MoneyType.style.alignContent = "center";
-MoneyType.zIndex = -9999;
+MoneyType.style.zIndex = -9999;
 document.body.appendChild(MoneyType);
 
 const MoneyLabel = document.createElement("span");
@@ -85,33 +104,24 @@ MoneyLabel.style.fontFamily = "Arial";
 MoneyLabel.style.fontWeight = "700";
 MoneyLabel.style.transition = "font-size 0.25s ease";
 MoneyLabel.innerHTML = `${StarterMoney}$`;
-MoneyLabel.zIndex = 0;
+MoneyLabel.style.zIndex = 0;
+MoneyLabel.style.display = "block";
+MoneyLabel.style.textAlign = "center";
 MoneyType.appendChild(MoneyLabel);
+
+const GainTypeLabel = document.createElement("span");
+GainTypeLabel.style.fontSize = `${Math.min(MoneyType.width, MoneyType.height) / 0.5}px`;
+GainTypeLabel.style.fontFamily = "Arial";
+GainTypeLabel.style.fontWeight = "700";
+GainTypeLabel.style.transition = "font-size 0.25s ease";
+GainTypeLabel.innerHTML = `0$, s`;
+GainTypeLabel.style.zIndex = 0;
+GainTypeLabel.style.display = "block";
+GainTypeLabel.style.textAlign = "center";
+MoneyType.appendChild(GainTypeLabel);
 
 const GridType = document.createElement("grid");
 document.body.appendChild(GridType);
-
-const SelectionFrame = document.createElement("div");
-SelectionFrame.style.width = "11.5%";
-SelectionFrame.style.alignContent = "center";
-SelectionFrame.style.alignItems = "center";
-SelectionFrame.style.height = "7%";
-SelectionFrame.style.backgroundColor = "rgba(255, 255, 255, 0.125)";
-SelectionFrame.style.opacity = "0";
-SelectionFrame.style.transition = "opacity 0.125s ease";
-SelectionFrame.style.position = "fixed";
-SelectionFrame.style.zIndex = -9999;
-document.body.appendChild(SelectionFrame);
-
-const SelectionLabel = document.createElement("span");
-SelectionLabel.style.width = "75%";
-SelectionLabel.style.height = "25%";
-SelectionFrame.style.textAlign = "center";
-SelectionLabel.style.fontSize = `${Math.min(SelectionFrame.width, SelectionFrame.height) / 0.5}px`;
-SelectionLabel.style.padding = "24px";
-SelectionLabel.style.fontFamily = "Arial";
-SelectionLabel.style.fontWeight = "900";
-SelectionFrame.appendChild(SelectionLabel);
 
 const BuildingFrame = document.createElement("div");
 BuildingFrame.style.position = "fixed";
@@ -193,6 +203,28 @@ for (let Index = 0; Index < Buildings.length; Index++) {
     });
 }
 
+let AddedPieces = [];
+for (let Index = 0; Index < MapSize; Index++) {
+    const CenterIndex = Math.floor(MapSize / 16) * Index;
+    const CenterRow = String.fromCharCode(65 + Math.floor(CenterIndex / 16)).toUpperCase();
+    const CenterColumn = CenterIndex % 16;
+    const CenterElementName = `${CenterRow}${CenterColumn}`;
+    const CenterGridPiece = document.getElementById(CenterElementName);
+
+    if (CenterGridPiece && AddedPieces.findIndex(piece => piece.id === CenterElementName) === -1) {
+        const CenterPieceImage = document.createElement('img');
+        CenterPieceImage.style.width = "25%";
+        CenterPieceImage.style.height = "auto";
+        CenterPieceImage.src = "../images/center-piece.svg";
+        CenterPieceImage.style.userSelect = "none";
+        CenterPieceImage.style.userSelectShadow = "none";
+        CenterPieceImage.draggable = false;
+        CenterGridPiece.appendChild(CenterPieceImage);
+
+        AddedPieces.push(CenterGridPiece)
+    }
+}
+
 for (let Index = 0; Index < MapSize; Index++) {
     const Row = String.fromCharCode(65 + Math.floor(Index / 16));
     const Column = Index % 16;
@@ -208,15 +240,17 @@ for (let Index = 0; Index < MapSize; Index++) {
     GridElement.style.cursor = "pointer";
     GridType.appendChild(GridElement);
 
-    GridElement.addEventListener("mouseenter", function () {
-        this.style.backgroundColor = "rgba(255, 255, 255, 0.125)";
-        CurrentHover = this;
-    });
-    GridElement.addEventListener("mouseleave", function () {
+    GridElement.addEventListener("mouseenter", function() {
+        if (AddedPieces.findIndex(piece => piece.id === this.id) === -1) {
+            this.style.backgroundColor = "rgba(255, 255, 255, 0.125)";
+            CurrentHover = this;
+        }
+    });    
+    GridElement.addEventListener("mouseleave", function() {
         this.style.backgroundColor = "rgba(255, 255, 255, 0)";
         CurrentHover = null;
     });
-    GridElement.addEventListener("mousedown", function (event) {
+    GridElement.addEventListener("mousedown", function(event) {
         TutorialContrainter.style.opacity = "0";
         setTimeout(() => {
             TutorialContrainter.remove();
@@ -233,7 +267,6 @@ for (let Index = 0; Index < MapSize; Index++) {
     
             if (BuildingToRemove) {
                 ConstructedBuildings = ConstructedBuildings.filter(building => building.id !== this.id);
-                
                 
                 Array.from(CurrentHover.getElementsByTagName("div")).forEach(Building => {
                     let Comeback = parseInt(Building.dataset.Price * 0.75);
@@ -259,7 +292,7 @@ document.addEventListener("mousemove", function(Event) {
 })
 
 document.addEventListener("keydown", function(Event) {
-    if (Event.key.toUpperCase() === "R") {
+    if (Event.key.toUpperCase() === "R" && !IsMobile) {
         Rotation += RotationScale;
     }
 })
@@ -283,8 +316,6 @@ window.onbeforeunload = function() {
         });
     }
 }
-
-const IsMobile = navigator.userAgentData.mobile;
 
 if (document.title === "Redirecting") {
     if (IsMobile) {
@@ -311,11 +342,15 @@ function ClearSelection() {
 }
 
 function GainLoop() {
+    let TotalGain = 0;
     if (ConstructedBuildings.length > 0) {
         ConstructedBuildings.forEach(Building => {
+            TotalGain += Building.Gain;
             localStorage.setItem("Money", parseInt(localStorage.getItem("Money")) + (Building.Gain * GainMultiplier));
         });
     }
+
+    GainTypeLabel.innerHTML = `${TotalGain}$, ${GainEvery / 1000}s`;
 
     setTimeout(() => {
         GainLoop();
@@ -336,17 +371,16 @@ function Loop() {
     RotationCursor.style.transform = `rotate(${Rotation}deg)`;
 
     if (CurrentSelection) {
-	    RotationCursor.style.opacity = "1";
-        SelectionFrame.style.opacity = "1";
+	    if (!IsMobile) {
+            RotationCursor.style.opacity = "1";
+        }
+
         BuildingFrame.style.opacity = "1";
         ClearSelection();
-        SelectionLabel.innerHTML = CurrentSelection.id;
         CurrentSelection.style.backgroundColor = "rgba(255, 255, 255, 0.125)";
         CurrentSelection.dataset.ChildrenCount = CurrentSelection.children.length;
-        SelectionLabel.innerHTML = CurrentSelection.id;
     } else {
         ClearSelection();
-        SelectionFrame.style.opacity = "0";
         BuildingFrame.style.opacity = "0";
 	    RotationCursor.style.opacity = "0";
     }
