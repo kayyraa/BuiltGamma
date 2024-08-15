@@ -350,7 +350,7 @@ function GainLoop() {
         });
     }
 
-    GainTypeLabel.innerHTML = `${TotalGain}$, ${GainEvery / 1000}s`;
+    GainTypeLabel.innerHTML = `${TotalGain * GainMultiplier}$, ${GainEvery / 1000}s`;
 
     setTimeout(() => {
         GainLoop();
