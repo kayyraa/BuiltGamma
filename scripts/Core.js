@@ -269,7 +269,7 @@ for (let Index = 0; Index < MapSize; Index++) {
                 ConstructedBuildings = ConstructedBuildings.filter(building => building.id !== this.id);
                 
                 Array.from(CurrentHover.getElementsByTagName("div")).forEach(Building => {
-                    let Comeback = parseInt(Building.dataset.Price * 0.75);
+                    let Comeback = parseInt(Building.dataset.Price * PriceMultiplier);
                     let CurrentMoney = parseInt(localStorage.getItem("Money"));
                     localStorage.setItem("Money", CurrentMoney + Comeback);
                 });
