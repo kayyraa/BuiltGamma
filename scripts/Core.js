@@ -183,7 +183,7 @@ for (let Index = 0; Index < Buildings.length; Index++) {
         style: 'currency',
         currency: 'USD',
         minimumFractionDigits: 2
-    }).format(Buildings[Index].Gain);
+    }).format(Buildings[Index].Gain * GainMultiplier);
 
     GainLabel.innerHTML = `${FormattedGain}, ${GainEvery / 1000}s`;
     GainLabel.style.textAlign = "center";
